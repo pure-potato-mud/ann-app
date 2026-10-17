@@ -1,0 +1,8 @@
+# executable
+*.out
+
+# draft
+docs/drafts
+
+# IDE
+.vscode
