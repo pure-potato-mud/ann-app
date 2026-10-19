@@ -1,21 +1,30 @@
-# Machine Learning
+# ann-app
 
-personal learning logs.
+> [!NOTE]
+> This project is in a very early stage, and most features have not been implemented yet.
 
-## build script (for LINUX, specifically Debian)
+A CLI with features driven by ANNs (e.g., CNNs, GNNs, RNNs).
 
-before calling the script, you should make sure you have installed following tools:
+## build script (for Linux, specifically Debian)
+
+Before calling the script, you should make sure you have installed the following tools:
 
 - gcc
 
-build program:
+Build the program:
 
 ```bash
-. ./script/build.sh
+./script/build.sh
 ```
 
-build and run executable:
+Build and run executable:
 
 ```bash
-. ./script/build.sh --run
+./script/build.sh --run
+```
+
+Run executable:
+
+```bash
+./script/run.sh
 ```
