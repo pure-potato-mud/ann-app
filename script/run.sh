@@ -2,7 +2,7 @@ SCRIPT_FILE=${BASH_SOURCE[0]}
 SOURCE_FILE=$0
 PROJ_DIR=$(cd -- "$( dirname -- "$SCRIPT_FILE" )/.." &> /dev/null && pwd)
 PROJ_NAME=$(basename "$PROJ_DIR")
-EXEC_FILE_NAME=${PROJ_DIR}/build/${PROJ_NAME}.out
+EXEC_FILE_NAME=${PROJ_DIR}/build/${PROJ_NAME}
 
 
 echo -e "running executable...\n"

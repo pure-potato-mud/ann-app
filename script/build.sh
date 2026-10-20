@@ -1,24 +1,49 @@
 SCRIPT_FILE=${BASH_SOURCE[0]}
 SOURCE_FILE=$0
 PROJ_DIR=$(cd -- "$( dirname -- "$SCRIPT_FILE" )/.." &> /dev/null && pwd)
-PROJ_NAME=$(basename "$PROJ_DIR")
-EXEC_FILE_NAME=${PROJ_DIR}/build/${PROJ_NAME}.out
+BUILD_DIR=${PROJ_DIR}/build
 
-# build
-echo "compiling..."
-gcc --std=c99 ${PROJ_DIR}/src/*.c -I ${PROJ_DIR}/src/ -lm -o $EXEC_FILE_NAME
-compile_status=$?
-if [ $compile_status -eq 0 ]; then
-  echo "compile completed."
-else
-  echo "compile failed."
+leave() {
+  local status=$1
   if [ $SCRIPT_FILE = $SOURCE_FILE ]; then
-    exit $compile_status
+    exit $status
   else
-    return $compile_status
+    return $status
   fi
+}
+
+echo_result() {
+  local status=$1
+  local success_text=$2
+  local fail_text=$3
+  if [ $status -eq 0 ]; then
+    if [[ $success_text != "" ]]; then
+      echo $success_text
+    fi
+  else
+    if [[ $fail_text != "" ]]; then
+      echo $fail_text
+    fi
+  fi
+  return $status
+}
+
+# configure
+cmake -S $PROJ_DIR -B $BUILD_DIR
+configure_status=$?
+echo_result $configure_status "" "configure failed."
+if [[ $configure_status -ne 0 ]]; then
+echo hi
+  return $(leave)
 fi
 
+# build
+cmake --build $BUILD_DIR
+build_status=$?
+echo_result $build_status "" "build failed."
+if [[ $build_status -ne 0 ]]; then
+  return $(leave)
+fi
 
 # run(optional)
 if [ "$1" = "--run" ]; then
