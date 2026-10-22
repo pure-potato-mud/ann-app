@@ -1,7 +1,5 @@
 #include <stdlib.h>
 
-#include <stdio.h>
-
 #include "mlp.h"
 
 float activate(float value) { return (value > 0) ? value : value * 0.03125f; }
@@ -241,18 +239,16 @@ int mlp_backward(struct mlp_t *mlp, const float *const answer) {
         if (i > 0) {
           backward_layers[i - 1U][k] =
               (j == 0 ? 0.0f : backward_layers[i - 1U][k]) +
-              learn_rate * weights[i][j_idx + k] * backward_layers[i][j];
+              weights[i][j_idx + k] * backward_layers[i][j];
         }
 
         // dz/dw = x
         weights[i][j_idx + k] -=
-            ((i == last_layer_idx - 1U) ? learn_rate : 1.0f) * layers[i][k] *
-            backward_layers[i][j];
+            learn_rate * layers[i][k] * backward_layers[i][j];
       }
 
       // dz/db = 1
-      bias[i][j] -= ((i == last_layer_idx - 1U) ? learn_rate : 1.0f) *
-                    backward_layers[i][j];
+      bias[i][j] -= learn_rate * backward_layers[i][j];
     }
   }
 
