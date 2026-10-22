@@ -2,8 +2,12 @@
 
 #include "mlp.h"
 
-float activate(float value) { return (value > 0) ? value : value * 0.03125f; }
-float d_activate(float value) { return (value > 0) ? 1.0f : 0.03125f; }
+float activate(float value) {
+  return (value > 0) ? value : value * 0.03125f;
+}
+float d_activate(float value) {
+  return (value > 0) ? 1.0f : 0.03125f;
+}
 
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
