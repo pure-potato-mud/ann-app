@@ -11,8 +11,8 @@ float d_activate(float value) {
 
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
-struct mlp_t *make_mlp(float learn_rate, size_t *layer_sizes,
-                       size_t layer_size_count) {
+struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
+                     size_t layer_size_count) {
   size_t layer_full_size = layer_size_count * 5 - 4;
 
   float **layers = (float **)malloc(layer_full_size * sizeof(float *));
@@ -67,7 +67,7 @@ struct mlp_t *make_mlp(float learn_rate, size_t *layer_sizes,
     layers[i] = layer_elements + (size_t)layers[i];
   }
 
-  struct mlp_t *mlp = (struct mlp_t *)malloc(sizeof(struct mlp_t));
+  struct mlp *mlp = (struct mlp *)malloc(sizeof(struct mlp));
   if (mlp == NULL) {
     free(layer_elements);
     free(layers);
@@ -86,7 +86,7 @@ struct mlp_t *make_mlp(float learn_rate, size_t *layer_sizes,
   return mlp;
 }
 
-void free_mlp(struct mlp_t *mlp) {
+void free_mlp(struct mlp *mlp) {
   if (mlp == NULL) {
     return;
   }
@@ -97,7 +97,7 @@ void free_mlp(struct mlp_t *mlp) {
   free(mlp);
 }
 
-int fill_bias(struct mlp_t *mlp, const float value) {
+int fill_bias(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
   }
@@ -112,7 +112,7 @@ int fill_bias(struct mlp_t *mlp, const float value) {
   return 0;
 }
 
-int fill_weights(struct mlp_t *mlp, const float value) {
+int fill_weights(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
   }
@@ -127,7 +127,7 @@ int fill_weights(struct mlp_t *mlp, const float value) {
   return 0;
 }
 
-int fill_random_weights(struct mlp_t *mlp, uint32_t seed) {
+int fill_random_weights(struct mlp *mlp, uint32_t seed) {
   if (mlp == NULL) {
     return 1;
   }
@@ -147,7 +147,7 @@ int fill_random_weights(struct mlp_t *mlp, uint32_t seed) {
   return 0;
 }
 
-int mlp_forward(struct mlp_t *mlp, const float *const input, float *output) {
+int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
   if (mlp == NULL || input == NULL) {
     return 1;
   }
@@ -190,7 +190,7 @@ int mlp_forward(struct mlp_t *mlp, const float *const input, float *output) {
   return 0;
 }
 
-int mlp_backward(struct mlp_t *mlp, const float *const answer) {
+int mlp_backward(struct mlp *mlp, const float *const answer) {
   if (mlp == NULL || answer == NULL) {
     return 1;
   }
