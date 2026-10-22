@@ -4,10 +4,8 @@
 
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
-struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
-                       float (**activation_funcs)(float),
-                       size_t layer_size_count) {
-  if (layer_sizes == NULL || activation_funcs == NULL) {
+struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
+  if (layer_sizes == NULL) {
     return NULL;
   }
 
@@ -18,10 +16,10 @@ struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
     return NULL;
   }
 
-  size_t output_layer_offset = layer_size_count;
-  size_t backward_layer_offset = layer_size_count * 2U - 1U;
-  size_t bias_offset = layer_size_count * 3U - 2U;
-  size_t weight_offset = layer_size_count * 4U - 3U;
+  const size_t output_layer_offset = layer_size_count;
+  const size_t backward_layer_offset = layer_size_count * 2U - 1U;
+  const size_t bias_offset = layer_size_count * 3U - 2U;
+  const size_t weight_offset = layer_size_count * 4U - 3U;
 
   // get offsets before malloc at once.
   size_t i, offset_sum = 0, current_size, current_layer_idx;
@@ -72,15 +70,13 @@ struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
     return NULL;
   }
 
-  mlp->learn_rate = learn_rate;
   mlp->layer_size_count = layer_size_count;
-  mlp->layer_sizes = layer_sizes;
+  mlp->layer_sizes_ref = layer_sizes;
   mlp->layers = layers;
   mlp->output_layers = layers + output_layer_offset;
   mlp->backward_layers = layers + backward_layer_offset;
   mlp->bias = layers + bias_offset;
   mlp->weights = layers + weight_offset;
-  mlp->activation_funcs = activation_funcs;
 
   return mlp;
 }
@@ -96,6 +92,26 @@ void mlp_destroy(struct mlp *mlp) {
   free(mlp);
 }
 
+int mlp_set_learning_rate(struct mlp *mlp, float learning_rate) {
+  if (mlp == NULL) {
+    return 1;
+  }
+  mlp->learn_rate = learning_rate;
+  return 0;
+}
+
+int mlp_set_activation_fns_ref(struct mlp *mlp,
+                               float (**activation_funcs)(float)) {
+  if (mlp == NULL) {
+    return 1;
+  }
+  if (activation_funcs == NULL) {
+    return 2;
+  }
+  mlp->activation_funcs_ref = activation_funcs;
+  return 0;
+}
+
 int mlp_fill_bias(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
@@ -103,7 +119,7 @@ int mlp_fill_bias(struct mlp *mlp, const float value) {
   uint32_t i, j;
   size_t size;
   for (i = 0; i < mlp->layer_size_count - 1U; ++i) {
-    size = mlp->layer_sizes[i + 1];
+    size = mlp->layer_sizes_ref[i + 1];
     for (j = 0; j < size; ++j) {
       mlp->bias[i][j] = value;
     }
@@ -118,7 +134,7 @@ int mlp_fill_weights(struct mlp *mlp, const float value) {
   uint32_t i, j;
   size_t size;
   for (i = 0; i < mlp->layer_size_count - 1U; ++i) {
-    size = mlp->layer_sizes[i] * mlp->layer_sizes[i + 1];
+    size = mlp->layer_sizes_ref[i] * mlp->layer_sizes_ref[i + 1];
     for (j = 0; j < size; ++j) {
       mlp->weights[i][j] = value;
     }
@@ -133,7 +149,7 @@ int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed) {
   uint32_t i, j;
   size_t size;
   for (i = 0; i < mlp->layer_size_count - 1U; ++i) {
-    size = mlp->layer_sizes[i] * mlp->layer_sizes[i + 1];
+    size = mlp->layer_sizes_ref[i] * mlp->layer_sizes_ref[i + 1];
     for (j = 0; j < size; ++j) {
 
       seed ^= seed << 7;
@@ -151,14 +167,14 @@ int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
     return 1;
   }
   uint32_t i, j, k;
-  size_t *layer_sizes = mlp->layer_sizes;
+  const size_t *layer_sizes = mlp->layer_sizes_ref;
   size_t back_layer_size;
   size_t front_layer_size;
-  float **layers = mlp->layers;
-  float **output_layers = mlp->output_layers;
-  float **bias = mlp->bias;
-  float **weights = mlp->weights;
-  float *input_layer = layers[0];
+  float **const layers = mlp->layers;
+  float **const output_layers = mlp->output_layers;
+  float **const bias = mlp->bias;
+  float **const weights = mlp->weights;
+  float *const input_layer = layers[0];
   size_t j_idx;
   for (i = 0; i < layer_sizes[0]; ++i) {
     input_layer[i] = input[i];
@@ -177,7 +193,7 @@ int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
         output_layers[i][j] += weights[i][j_idx + k] * layers[i][k];
       }
 
-      layers[i + 1][j] = mlp->activation_funcs[i](output_layers[i][j]);
+      layers[i + 1][j] = mlp->activation_funcs_ref[i](output_layers[i][j]);
     }
   }
   if (output != NULL) {
@@ -195,20 +211,20 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
   }
 
   uint32_t i, j, k;
-  float learn_rate = mlp->learn_rate;
-  size_t layer_size_count = mlp->layer_size_count;
-  size_t last_layer_idx = layer_size_count - 1U;
+  const float learn_rate = mlp->learn_rate;
+  const size_t layer_size_count = mlp->layer_size_count;
+  const size_t last_layer_idx = layer_size_count - 1U;
 
-  size_t *layer_sizes = mlp->layer_sizes;
-  float **layers = mlp->layers;
-  float **output_layers = mlp->output_layers;
-  float **backward_layers = mlp->backward_layers;
-  float **bias = mlp->bias;
-  float **weights = mlp->weights;
-  float (**activation_funcs)(float) = mlp->activation_funcs;
+  const size_t *layer_sizes = mlp->layer_sizes_ref;
+  float **const layers = mlp->layers;
+  float **const output_layers = mlp->output_layers;
+  float **const backward_layers = mlp->backward_layers;
+  float **const bias = mlp->bias;
+  float **const weights = mlp->weights;
+  float (**activation_funcs)(float) = mlp->activation_funcs_ref;
 
-  float *last_output_layer = layers[last_layer_idx];
-  float *last_backward_layer = backward_layers[last_layer_idx - 1U];
+  float *const last_output_layer = layers[last_layer_idx];
+  float *const last_backward_layer = backward_layers[last_layer_idx - 1U];
   for (i = 0; i < layer_sizes[last_layer_idx]; ++i) {
     // L(a) = 0.5 * (a - y)^2
     // L'(a) = a - y
@@ -233,9 +249,9 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
 
       // = dL/da * da/dz
       backward_layers[i][j] *=
-          (activation_funcs[i](output_layers[i][j] + 5e-7f) -
-           activation_funcs[i](output_layers[i][j] - 5e-7f)) /
-          1e-6f;
+          (activation_funcs[i](output_layers[i][j] + 4.76837e-7f) -
+           activation_funcs[i](output_layers[i][j] - 4.76837e-7f)) /
+          9.53674e-7f;
 
       j_idx = j * back_layer_size;
       for (k = 0; k < back_layer_size; ++k) {

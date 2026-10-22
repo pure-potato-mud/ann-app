@@ -7,24 +7,27 @@
 // NOTE: layers and its first pointer also need to free.
 struct mlp {
   float learn_rate;
-  size_t layer_size_count;           // N
-  size_t *layer_sizes;               // n1, n2...
-  float **layers;                    // input & activated ouput (N)
-  float **output_layers;             // output (N-1)
-  float **backward_layers;           // passes gradiants (N-1)
-  float **bias;                      // bias (N-1)
-  float **weights;                   // weights(N-1)
-  float (**activation_funcs)(float); // activation functions(N-1)
+  size_t layer_size_count;               // N
+  const size_t *layer_sizes_ref;         // n1, n2...
+  float **layers;                        // input & activated ouput (N)
+  float **output_layers;                 // output (N-1)
+  float **backward_layers;               // passes gradiants (N-1)
+  float **bias;                          // bias (N-1)
+  float **weights;                       // weights(N-1)
+  float (**activation_funcs_ref)(float); // activation functions(N-1)
 };
 
 // layer_sizes will keep and store in mlp. DO NOT free layer_sizes before mlp
 // been free. or you can use `free_mlp` to free savely.
-struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
-                       float (**activation_funcs)(float),
-                       size_t layer_size_count);
+struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count);
 
 // free mlp savely.
 void mlp_destroy(struct mlp *mlp);
+
+int mlp_set_learning_rate(struct mlp *mlp, float learning_rate);
+
+int mlp_set_activation_fns_ref(struct mlp *mlp,
+                               float (**activation_funcs)(float));
 
 // fill all bias with a value.
 int mlp_fill_bias(struct mlp *mlp, float value);
