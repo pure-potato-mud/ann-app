@@ -6,7 +6,7 @@
 
 // NOTE: layers and its first pointer also need to free.
 struct mlp {
-  float learn_rate;
+  float learning_rate;
   size_t layer_size_count;               // N
   const size_t *layer_sizes_ref;         // n1, n2...
   float **layers;                        // input & activated ouput (N)

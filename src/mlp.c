@@ -96,7 +96,7 @@ int mlp_set_learning_rate(struct mlp *mlp, float learning_rate) {
   if (mlp == NULL) {
     return 1;
   }
-  mlp->learn_rate = learning_rate;
+  mlp->learning_rate = learning_rate;
   return 0;
 }
 
@@ -211,7 +211,7 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
   }
 
   uint32_t i, j, k;
-  const float learn_rate = mlp->learn_rate;
+  const float learn_rate = mlp->learning_rate;
   const size_t layer_size_count = mlp->layer_size_count;
   const size_t last_layer_idx = layer_size_count - 1U;
 
