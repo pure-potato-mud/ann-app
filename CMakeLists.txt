@@ -24,3 +24,9 @@ add_executable(${CMAKE_PROJECT_NAME}
 target_link_libraries(${CMAKE_PROJECT_NAME}
   PRIVATE mlp
 )
+
+include(CTest)
+
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
