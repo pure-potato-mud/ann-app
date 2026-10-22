@@ -12,8 +12,8 @@ struct mlp {
   float **layers;                        // input & activated ouput (N)
   float **output_layers;                 // output (N-1)
   float **backward_layers;               // passes gradiants (N-1)
-  float **bias;                          // bias (N-1)
   float **weights;                       // weights(N-1)
+  float **bias;                          // bias (N-1)
   float (**activation_funcs_ref)(float); // activation functions(N-1)
 };
 

@@ -18,8 +18,8 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
 
   const size_t output_layer_offset = layer_size_count;
   const size_t backward_layer_offset = layer_size_count * 2U - 1U;
-  const size_t bias_offset = layer_size_count * 3U - 2U;
-  const size_t weight_offset = layer_size_count * 4U - 3U;
+  const size_t weight_offset = layer_size_count * 3U - 2U;
+  const size_t bias_offset = layer_size_count * 4U - 3U;
 
   // get offsets before malloc at once.
   size_t i, offset_sum = 0, current_size, current_layer_idx;
@@ -28,14 +28,14 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
       current_size = layer_sizes[i];
     } else if (i < backward_layer_offset) { // offsets for output_layers
       current_size = layer_sizes[i - layer_size_count + 1U];
-    } else if (i < bias_offset) { // offsets for backward_layers
+    } else if (i < weight_offset) { // offsets for backward_layers
       current_size = layer_sizes[i - backward_layer_offset + 1U];
-    } else if (i < weight_offset) { // offsets for bias
-      current_size = layer_sizes[i - bias_offset + 1U];
-    } else { // offsets for weights
+    } else if (i < bias_offset) { // offsets for weights
       current_layer_idx = i - weight_offset + 1U;
       current_size =
           layer_sizes[current_layer_idx] * layer_sizes[current_layer_idx - 1U];
+    } else { // offsets for bias
+      current_size = layer_sizes[i - bias_offset + 1U];
     }
 
     if (SIZE_MAX - current_size < offset_sum) {
