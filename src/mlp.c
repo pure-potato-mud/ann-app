@@ -95,7 +95,6 @@ void free_mlp(struct mlp_t *mlp) {
   free(layer_elements);
   free(layers);
   free(mlp);
-  return;
 }
 
 int fill_bias(struct mlp_t *mlp, const float value) {
@@ -142,7 +141,7 @@ int fill_random_weights(struct mlp_t *mlp, uint32_t seed) {
       seed ^= seed >> 19;
       seed ^= seed << 13;
 
-      mlp->weights[i][j] = 2 * (seed / (float)UINT32_MAX) - 1;
+      mlp->weights[i][j] = 2 * ((float)seed / UINT32_MAX) - 1;
     }
   }
   return 0;
