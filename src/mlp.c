@@ -4,9 +4,9 @@
 
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
-struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
-                     float (**activation_funcs)(float),
-                     size_t layer_size_count) {
+struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
+                       float (**activation_funcs)(float),
+                       size_t layer_size_count) {
   if (layer_sizes == NULL || activation_funcs == NULL) {
     return NULL;
   }
@@ -85,7 +85,7 @@ struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
   return mlp;
 }
 
-void free_mlp(struct mlp *mlp) {
+void mlp_destroy(struct mlp *mlp) {
   if (mlp == NULL) {
     return;
   }
@@ -96,7 +96,7 @@ void free_mlp(struct mlp *mlp) {
   free(mlp);
 }
 
-int fill_bias(struct mlp *mlp, const float value) {
+int mlp_fill_bias(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
   }
@@ -111,7 +111,7 @@ int fill_bias(struct mlp *mlp, const float value) {
   return 0;
 }
 
-int fill_weights(struct mlp *mlp, const float value) {
+int mlp_fill_weights(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
   }
@@ -126,7 +126,7 @@ int fill_weights(struct mlp *mlp, const float value) {
   return 0;
 }
 
-int fill_random_weights(struct mlp *mlp, uint32_t seed) {
+int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed) {
   if (mlp == NULL) {
     return 1;
   }

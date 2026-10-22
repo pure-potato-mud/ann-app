@@ -19,19 +19,19 @@ struct mlp {
 
 // layer_sizes will keep and store in mlp. DO NOT free layer_sizes before mlp
 // been free. or you can use `free_mlp` to free savely.
-struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
-                     float (**activation_funcs)(float),
-                     size_t layer_size_count);
+struct mlp *mlp_create(float learn_rate, size_t *layer_sizes,
+                       float (**activation_funcs)(float),
+                       size_t layer_size_count);
 
 // free mlp savely.
-void free_mlp(struct mlp *mlp);
+void mlp_destroy(struct mlp *mlp);
 
 // fill all bias with a value.
-int fill_bias(struct mlp *mlp, float value);
+int mlp_fill_bias(struct mlp *mlp, float value);
 
 // fill all weights with a value.
-int fill_weights(struct mlp *mlp, float value);
-int fill_random_weights(struct mlp *mlp, uint32_t seed);
+int mlp_fill_weights(struct mlp *mlp, float value);
+int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed);
 
 // mlp and input cannot be NULL.
 // non-zero return means error.
