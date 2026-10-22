@@ -10,6 +10,7 @@ A CLI with features driven by ANNs (e.g., CNNs, GNNs, RNNs).
 Before calling the script, you should make sure you have installed the following tools:
 
 - gcc
+- cmake
 
 Build the program:
 
@@ -27,4 +28,10 @@ Run executable:
 
 ```bash
 ./script/run.sh
+```
+
+Run test:
+
+```bash
+./script/test.sh
 ```
