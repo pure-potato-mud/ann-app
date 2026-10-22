@@ -4,24 +4,23 @@
 #include <stddef.h>
 #include <stdint.h>
 
-float activate(float value);
-float d_activate(float value);
-
 // NOTE: layers and its first pointer also need to free.
 struct mlp {
   float learn_rate;
-  size_t layer_size_count; // N
-  size_t *layer_sizes;     // n1, n2...
-  float **layers;          // input & activated ouput (N)
-  float **output_layers;   // output (N-1)
-  float **backward_layers; // passes gradiants (N-1)
-  float **bias;            // bias (N-1)
-  float **weights;         // weights(N-1)
+  size_t layer_size_count;           // N
+  size_t *layer_sizes;               // n1, n2...
+  float **layers;                    // input & activated ouput (N)
+  float **output_layers;             // output (N-1)
+  float **backward_layers;           // passes gradiants (N-1)
+  float **bias;                      // bias (N-1)
+  float **weights;                   // weights(N-1)
+  float (**activation_funcs)(float); // activation functions(N-1)
 };
 
 // layer_sizes will keep and store in mlp. DO NOT free layer_sizes before mlp
 // been free. or you can use `free_mlp` to free savely.
 struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
+                     float (**activation_funcs)(float),
                      size_t layer_size_count);
 
 // free mlp savely.

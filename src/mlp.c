@@ -2,17 +2,15 @@
 
 #include "mlp.h"
 
-float activate(float value) {
-  return (value > 0) ? value : value * 0.03125f;
-}
-float d_activate(float value) {
-  return (value > 0) ? 1.0f : 0.03125f;
-}
-
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
 struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
+                     float (**activation_funcs)(float),
                      size_t layer_size_count) {
+  if (layer_sizes == NULL || activation_funcs == NULL) {
+    return NULL;
+  }
+
   size_t layer_full_size = layer_size_count * 5 - 4;
 
   float **layers = (float **)malloc(layer_full_size * sizeof(float *));
@@ -82,6 +80,7 @@ struct mlp *make_mlp(float learn_rate, size_t *layer_sizes,
   mlp->backward_layers = layers + backward_layer_offset;
   mlp->bias = layers + bias_offset;
   mlp->weights = layers + weight_offset;
+  mlp->activation_funcs = activation_funcs;
 
   return mlp;
 }
@@ -178,7 +177,7 @@ int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
         output_layers[i][j] += weights[i][j_idx + k] * layers[i][k];
       }
 
-      layers[i + 1][j] = activate(output_layers[i][j]);
+      layers[i + 1][j] = mlp->activation_funcs[i](output_layers[i][j]);
     }
   }
   if (output != NULL) {
@@ -206,6 +205,7 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
   float **backward_layers = mlp->backward_layers;
   float **bias = mlp->bias;
   float **weights = mlp->weights;
+  float (**activation_funcs)(float) = mlp->activation_funcs;
 
   float *last_output_layer = layers[last_layer_idx];
   float *last_backward_layer = backward_layers[last_layer_idx - 1U];
@@ -232,7 +232,10 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
       // n is for any part, there are weight(w), input(x) and bias(b).
 
       // = dL/da * da/dz
-      backward_layers[i][j] *= d_activate(output_layers[i][j]);
+      backward_layers[i][j] *=
+          (activation_funcs[i](output_layers[i][j] + 5e-7f) -
+           activation_funcs[i](output_layers[i][j] - 5e-7f)) /
+          1e-6f;
 
       j_idx = j * back_layer_size;
       for (k = 0; k < back_layer_size; ++k) {
