@@ -28,8 +28,30 @@ void test_mlp_create(void) {
   TEST_ASSERT_NOT_NULL(mlp);
 }
 
-void test_mlp_create_zero_size(void) {
+void test_mlp_create_zero_layer(void) {
   mlp = mlp_create(layer_sizes, 0);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
+void test_mlp_create_zero_neuron(void) {
+  size_t small_layer_sizes[3] = {0, 0, 0};
+  mlp = mlp_create(small_layer_sizes, 3);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
+void test_mlp_create_too_large(void) {
+  size_t large_layer_sizes[3] = {SIZE_MAX >> 1, (SIZE_MAX >> 2) / 3,
+                                 (SIZE_MAX >> 2) / 3};
+  mlp = mlp_create(large_layer_sizes, 3);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
+void test_mlp_create_much_too_large(void) {
+  size_t very_large_layer_sizes[3] = {1, SIZE_MAX, 1};
+  mlp = mlp_create(very_large_layer_sizes, 3);
 
   TEST_ASSERT_NULL(mlp);
 }
@@ -119,6 +141,14 @@ void test_mlp_forward(void) {
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(1e-7f, except_output, output, 2);
 }
 
+void test_mlp_forward_no_activation_funcs(void) {
+  float input[2] = {0.5f, 2.0f};
+  mlp = mlp_create(layer_sizes, layer_size_count);
+  TEST_ASSERT_NOT_NULL(mlp);
+
+  TEST_ASSERT_EQUAL_INT(2, mlp_forward(mlp, input, NULL));
+}
+
 void test_mlp_backward(void) {
   float input[2] = {0.5f, 2.0f};
   float output[2], answer[2] = {1.0f, 0.0f};
@@ -143,10 +173,21 @@ void test_mlp_backward(void) {
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_2, mlp->bias[1], 2);
 }
 
+void test_mlp_backward_no_activation_funcs(void) {
+  float answer[2] = {1.0f, 0.0f};
+  struct mlp *mlp = mlp_create(layer_sizes, layer_size_count);
+  TEST_ASSERT_NOT_NULL(mlp);
+
+  TEST_ASSERT_EQUAL_INT(2, mlp_backward(mlp, answer));
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_mlp_create);
-  RUN_TEST(test_mlp_create_zero_size);
+  RUN_TEST(test_mlp_create_zero_layer);
+  RUN_TEST(test_mlp_create_zero_neuron);
+  RUN_TEST(test_mlp_create_too_large);
+  RUN_TEST(test_mlp_create_much_too_large);
   RUN_TEST(test_mlp_create_null);
   RUN_TEST(test_mlp_set_learning_rate);
   RUN_TEST(test_mlp_set_activation_fns_ref);
@@ -154,6 +195,8 @@ int main(void) {
   RUN_TEST(test_mlp_fill_weights);
   RUN_TEST(test_mlp_fill_random_weights);
   RUN_TEST(test_mlp_forward);
+  RUN_TEST(test_mlp_forward_no_activation_funcs);
   RUN_TEST(test_mlp_backward);
+  RUN_TEST(test_mlp_backward_no_activation_funcs);
   return UNITY_END();
 }
