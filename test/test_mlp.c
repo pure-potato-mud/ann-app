@@ -31,6 +31,12 @@ void test_mlp_create(void) {
   TEST_ASSERT_NOT_NULL(mlp);
 }
 
+void test_mlp_create_null(void) {
+  mlp = mlp_create(NULL, layer_size_count);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
 void test_mlp_create_one_layer(void) {
   mlp = mlp_create(layer_sizes, 1U);
 
@@ -44,23 +50,24 @@ void test_mlp_create_zero_neuron(void) {
   TEST_ASSERT_NULL(mlp);
 }
 
-void test_mlp_create_too_large(void) {
+void test_mlp_create_large_layer_full_size(void) {
+  size_t large[2] = {1U, 1U};
+  mlp = mlp_create(large, (SIZE_MAX - 1U) / 5U + 1U);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
+void test_mlp_create_large_layer_offsets(void) {
+  size_t large[2] = {1U, 1U};
+  mlp = mlp_create(large, ((SIZE_MAX - 1U) / 5U + 1U) >> 3);
+
+  TEST_ASSERT_NULL(mlp);
+}
+
+void test_mlp_create_large_offset_sum(void) {
   size_t large_layer_sizes[3] = {SIZE_MAX >> 1, (SIZE_MAX >> 2) / 3,
                                  (SIZE_MAX >> 2) / 3};
   mlp = mlp_create(large_layer_sizes, 3U);
-
-  TEST_ASSERT_NULL(mlp);
-}
-
-void test_mlp_create_much_too_large(void) {
-  size_t very_large_layer_sizes[3] = {1, SIZE_MAX, 1};
-  mlp = mlp_create(very_large_layer_sizes, 3U);
-
-  TEST_ASSERT_NULL(mlp);
-}
-
-void test_mlp_create_null(void) {
-  mlp = mlp_create(NULL, layer_size_count);
 
   TEST_ASSERT_NULL(mlp);
 }
@@ -362,11 +369,12 @@ int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_mlp_create);
+  RUN_TEST(test_mlp_create_null);
   RUN_TEST(test_mlp_create_one_layer);
   RUN_TEST(test_mlp_create_zero_neuron);
-  RUN_TEST(test_mlp_create_too_large);
-  RUN_TEST(test_mlp_create_much_too_large);
-  RUN_TEST(test_mlp_create_null);
+  RUN_TEST(test_mlp_create_large_layer_full_size);
+  RUN_TEST(test_mlp_create_large_layer_offsets);
+  RUN_TEST(test_mlp_create_large_offset_sum);
 
   RUN_TEST(test_mlp_set_learning_rate);
 
