@@ -1,9 +1,9 @@
-# ann-app
+# ann-lib
 
 > [!NOTE]
 > This project is in a very early stage, and most features have not been implemented yet.
 
-A CLI with features driven by ANNs (e.g., CNNs, GNNs, RNNs).
+A library includes ANNs (e.g., CNNs, GNNs, RNNs).
 
 ## build script (for Linux, specifically Debian)
 
