@@ -82,16 +82,16 @@ void test_mlp_set_activation_fns_ref(void) {
   TEST_ASSERT_EQUAL_PTR(activation_funcs, mlp->activation_funcs_ref);
 }
 
-void test_mlp_fill_bias(void) {
+void test_mlp_fill_biases(void) {
   float except_layer1_biases[3U] = {1.0f, 1.0f, 1.0f};
   float except_layer2_biases[2U] = {1.0f, 1.0f};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
 
-  TEST_ASSERT_UNLESS(mlp_fill_bias(mlp, 1.0f));
+  TEST_ASSERT_UNLESS(mlp_fill_biases(mlp, 1.0f));
 
-  TEST_ASSERT_EQUAL_FLOAT_ARRAY(except_layer1_biases, mlp->bias[0U], 3U);
-  TEST_ASSERT_EQUAL_FLOAT_ARRAY(except_layer2_biases, mlp->bias[1U], 2U);
+  TEST_ASSERT_EQUAL_FLOAT_ARRAY(except_layer1_biases, mlp->biases[0U], 3U);
+  TEST_ASSERT_EQUAL_FLOAT_ARRAY(except_layer2_biases, mlp->biases[1U], 2U);
 }
 
 void test_mlp_fill_weights(void) {
@@ -133,7 +133,7 @@ void test_mlp_forward(void) {
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
   TEST_ASSERT_UNLESS(mlp_set_learning_rate(mlp, 0.125f));
-  TEST_ASSERT_UNLESS(mlp_fill_bias(mlp, -0.5f));
+  TEST_ASSERT_UNLESS(mlp_fill_biases(mlp, -0.5f));
   TEST_ASSERT_UNLESS(mlp_fill_weights(mlp, 1.0f));
 
   TEST_ASSERT_UNLESS(mlp_forward(mlp, input, output));
@@ -159,16 +159,16 @@ void test_mlp_backward(void) {
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
   TEST_ASSERT_UNLESS(mlp_set_learning_rate(mlp, 0.125f));
-  TEST_ASSERT_UNLESS(mlp_fill_bias(mlp, -0.5f));
+  TEST_ASSERT_UNLESS(mlp_fill_biases(mlp, -0.5f));
   TEST_ASSERT_UNLESS(mlp_fill_weights(mlp, 1.0f));
 
   mlp_forward(mlp, input, output);
   mlp_backward(mlp, answer);
 
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, weight_1, mlp->weights[0U], 6U);
-  TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_1, mlp->bias[0U], 3U);
+  TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_1, mlp->biases[0U], 3U);
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, weight_2, mlp->weights[1U], 6U);
-  TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_2, mlp->bias[1U], 2U);
+  TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_2, mlp->biases[1U], 2U);
 }
 
 void test_mlp_backward_no_activation_funcs(void) {
@@ -188,7 +188,7 @@ int main(void) {
   RUN_TEST(test_mlp_create_null);
   RUN_TEST(test_mlp_set_learning_rate);
   RUN_TEST(test_mlp_set_activation_fns_ref);
-  RUN_TEST(test_mlp_fill_bias);
+  RUN_TEST(test_mlp_fill_biases);
   RUN_TEST(test_mlp_fill_weights);
   RUN_TEST(test_mlp_fill_random_weights);
   RUN_TEST(test_mlp_forward);

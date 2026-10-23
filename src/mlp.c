@@ -4,8 +4,8 @@
 
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
-struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
-  if (layer_sizes == NULL || layer_size_count == 0U) {
+struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
+  if (layer_sizes_ref == NULL || layer_size_count == 0U) {
     return NULL;
   }
 
@@ -31,7 +31,7 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
   size_t i, offset_sum = 0U, current_size, current_layer_idx;
   for (i = 0U; i < layer_full_size; ++i) {
     if (i < output_layer_offset) { // offsets for layers
-      current_size = layer_sizes[i];
+      current_size = layer_sizes_ref[i];
       // this branch reads all element of layer_size, so do layer size check
       // (cannot be zero) here.
       if (current_size == 0U) {
@@ -40,21 +40,21 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
         return NULL;
       }
     } else if (i < backward_layer_offset) { // offsets for output_layers
-      current_size = layer_sizes[i - layer_size_count + 1U];
+      current_size = layer_sizes_ref[i - layer_size_count + 1U];
     } else if (i < weight_offset) { // offsets for backward_layers
-      current_size = layer_sizes[i - backward_layer_offset + 1U];
+      current_size = layer_sizes_ref[i - backward_layer_offset + 1U];
     } else if (i < bias_offset) { // offsets for weights
       current_layer_idx = i - weight_offset + 1U;
-      if (SIZE_MAX / layer_sizes[current_layer_idx] <
-          layer_sizes[current_layer_idx - 1U]) {
+      if (SIZE_MAX / layer_sizes_ref[current_layer_idx] <
+          layer_sizes_ref[current_layer_idx - 1U]) {
         free(layer_addr_offsets);
         free(layers);
         return NULL;
       }
-      current_size =
-          layer_sizes[current_layer_idx] * layer_sizes[current_layer_idx - 1U];
+      current_size = layer_sizes_ref[current_layer_idx] *
+                     layer_sizes_ref[current_layer_idx - 1U];
     } else { // offsets for bias
-      current_size = layer_sizes[i - bias_offset + 1U];
+      current_size = layer_sizes_ref[i - bias_offset + 1U];
     }
 
     if (SIZE_MAX - current_size < offset_sum) {
@@ -93,15 +93,15 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
   }
 
   mlp->layer_size_count = layer_size_count;
-  mlp->layer_sizes_ref = layer_sizes;
+  mlp->layer_sizes_ref = layer_sizes_ref;
   mlp->layers = layers;
   mlp->output_layers = layers + output_layer_offset;
   mlp->backward_layers = layers + backward_layer_offset;
-  mlp->bias = layers + bias_offset;
+  mlp->biases = layers + bias_offset;
   mlp->weights = layers + weight_offset;
   mlp->activation_funcs_ref = NULL;
 
-  mlp_fill_bias(mlp, 0.0f);
+  mlp_fill_biases(mlp, 0.0f);
   mlp_fill_weights(mlp, 0.0f);
 
   return mlp;
@@ -136,29 +136,29 @@ int mlp_set_learning_rate(struct mlp *mlp, float learning_rate) {
 }
 
 int mlp_set_activation_fns_ref(struct mlp *mlp,
-                               float (**activation_funcs)(float)) {
+                               float (**activation_fns_ref)(float)) {
   if (mlp == NULL) {
     return 1;
   }
-  if (activation_funcs == NULL) {
+  if (activation_fns_ref == NULL) {
     return 2;
   }
-  mlp->activation_funcs_ref = activation_funcs;
+  mlp->activation_funcs_ref = activation_fns_ref;
   return 0;
 }
 
-int mlp_fill_bias(struct mlp *mlp, const float value) {
+int mlp_fill_biases(struct mlp *mlp, const float value) {
   if (mlp == NULL) {
     return 1;
   }
   size_t i, j, size;
   for (i = 0U; i < mlp->layer_size_count - 1U; ++i) {
     size = mlp->layer_sizes_ref[i + 1U];
-    if (mlp->bias[i] == NULL) {
+    if (mlp->biases[i] == NULL) {
       return 2;
     }
     for (j = 0U; j < size; ++j) {
-      mlp->bias[i][j] = value;
+      mlp->biases[i][j] = value;
     }
   }
   return 0;
@@ -212,7 +212,7 @@ int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
   const size_t *layer_sizes = mlp->layer_sizes_ref;
   float **const layers = mlp->layers;
   float **const output_layers = mlp->output_layers;
-  float **const biases = mlp->bias;
+  float **const biases = mlp->biases;
   float **const weights = mlp->weights;
   float (**activation_funcs_ref)(float) = mlp->activation_funcs_ref;
   if (layers == NULL || output_layers == NULL || biases == NULL ||
@@ -284,7 +284,7 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
   float **const layers = mlp->layers;
   float **const output_layers = mlp->output_layers;
   float **const backward_layers = mlp->backward_layers;
-  float **const biases = mlp->bias;
+  float **const biases = mlp->biases;
   float **const weights = mlp->weights;
   float (**activation_funcs_ref)(float) = mlp->activation_funcs_ref;
   if (layers == NULL || output_layers == NULL || backward_layers == NULL ||
