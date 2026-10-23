@@ -18,8 +18,8 @@ struct mlp {
 };
 
 // create a mlp.
-// layer_sizes_ref will keep and store in mlp. DO NOT free layer_sizes_ref
-// before mlp been free.
+// layer_sizes_ref will keep and store in mlp. DO NOT free nor edit
+// layer_sizes_ref before mlp been free.
 // layer_sizes_ref cannot be NULL and have no zero in it.
 // also, layer_size_count cannot be zero.
 struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count);
@@ -35,8 +35,8 @@ int mlp_set_learning_rate(struct mlp *mlp, float learning_rate);
 // set activation functions reference.
 // size must same as `layer_count - 1` of the MLP.
 // the MLP and the activation functions reference cannot be NULL.
-// activation_fns_ref will keep and store in mlp. DO NOT free activation_fns_ref
-// before mlp been free.
+// activation_fns_ref will keep and store in mlp. DO NOT free nor edit
+// activation_fns_ref before mlp been free.
 int mlp_set_activation_fns_ref(struct mlp *mlp,
                                float (**activation_fns_ref)(float));
 
