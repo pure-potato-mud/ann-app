@@ -112,6 +112,7 @@ struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
   mlp->weights = layers + weight_offset;
   mlp->activation_funcs_ref = NULL;
 
+  mlp_set_learning_rate(mlp, 0.0f);
   mlp_fill_biases(mlp, 0.0f);
   mlp_fill_weights(mlp, 0.0f);
 
