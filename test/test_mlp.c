@@ -14,6 +14,8 @@ static const float input[2] = {0.5f, 2.0f}, answer[2] = {1.0f, 0.0f};
 static const size_t layer_sizes[3] = {2U, 3U, 2U};
 static const size_t layer_size_count = 3U;
 static const float learning_rate = 0.125f;
+static float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu,
+                                               leaky_relu};
 
 void setUp() {
   mlp = NULL;
@@ -128,7 +130,6 @@ void test_mlp_fill_random_weights(void) {
 
 void test_mlp_forward(void) {
   float output[2U], except_output[2U] = {5.5f, 5.5f};
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -142,7 +143,6 @@ void test_mlp_forward(void) {
 }
 
 void test_mlp_forward_null_layers(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -156,7 +156,6 @@ void test_mlp_forward_null_layers(void) {
 }
 
 void test_mlp_forward_null_layer(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -170,7 +169,6 @@ void test_mlp_forward_null_layer(void) {
 }
 
 void test_mlp_forward_null_output_layers(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -180,7 +178,6 @@ void test_mlp_forward_null_output_layers(void) {
 }
 
 void test_mlp_forward_null_output_layer(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -190,7 +187,6 @@ void test_mlp_forward_null_output_layer(void) {
 }
 
 void test_mlp_forward_null_weights(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -200,7 +196,6 @@ void test_mlp_forward_null_weights(void) {
 }
 
 void test_mlp_forward_null_single_layer_weights(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -210,7 +205,6 @@ void test_mlp_forward_null_single_layer_weights(void) {
 }
 
 void test_mlp_forward_null_biases(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -220,7 +214,6 @@ void test_mlp_forward_null_biases(void) {
 }
 
 void test_mlp_forward_null_single_layer_biases(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -242,7 +235,6 @@ void test_mlp_backward(void) {
         bias_1[3U] = {-1.75f, -1.75f, -1.75f},
         weight_2[6U] = {-0.125f, -0.125f, -0.125f, -0.375f, -0.375f, -0.375f},
         bias_2[2U] = {-17 / 16.0f, -19 / 16.0f};
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -260,7 +252,6 @@ void test_mlp_backward(void) {
 }
 
 void test_mlp_backward_null_layers(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -274,7 +265,6 @@ void test_mlp_backward_null_layers(void) {
 }
 
 void test_mlp_backward_null_layer(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -288,7 +278,6 @@ void test_mlp_backward_null_layer(void) {
 }
 
 void test_mlp_backward_null_output_layers(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -298,7 +287,6 @@ void test_mlp_backward_null_output_layers(void) {
 }
 
 void test_mlp_backward_null_output_layer(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -308,7 +296,6 @@ void test_mlp_backward_null_output_layer(void) {
 }
 
 void test_mlp_backward_null_weights(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -318,7 +305,6 @@ void test_mlp_backward_null_weights(void) {
 }
 
 void test_mlp_backward_null_single_layer_weights(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -328,7 +314,6 @@ void test_mlp_backward_null_single_layer_weights(void) {
 }
 
 void test_mlp_backward_null_biases(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
@@ -338,7 +323,6 @@ void test_mlp_backward_null_biases(void) {
 }
 
 void test_mlp_backward_null_single_layer_biases(void) {
-  float (*activation_funcs[3U])(float) = {leaky_relu, leaky_relu, leaky_relu};
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
   TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
