@@ -29,8 +29,8 @@ void test_mlp_create(void) {
   TEST_ASSERT_NOT_NULL(mlp);
 }
 
-void test_mlp_create_zero_layer(void) {
-  mlp = mlp_create(layer_sizes, 0U);
+void test_mlp_create_one_layer(void) {
+  mlp = mlp_create(layer_sizes, 1U);
 
   TEST_ASSERT_NULL(mlp);
 }
@@ -181,7 +181,7 @@ void test_mlp_backward_no_activation_funcs(void) {
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_mlp_create);
-  RUN_TEST(test_mlp_create_zero_layer);
+  RUN_TEST(test_mlp_create_one_layer);
   RUN_TEST(test_mlp_create_zero_neuron);
   RUN_TEST(test_mlp_create_too_large);
   RUN_TEST(test_mlp_create_much_too_large);
