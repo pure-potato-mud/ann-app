@@ -5,18 +5,25 @@
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
 struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
-  if (layer_sizes_ref == NULL || layer_size_count == 0U) {
+  if (layer_sizes_ref == NULL || layer_size_count < 2U) {
     return NULL;
   }
 
   size_t layer_full_size = layer_size_count * 5U - 4U;
-
+  if (SIZE_MAX / sizeof(size_t) < layer_full_size) {
+    return NULL;
+  }
   size_t *layer_addr_offsets =
       (size_t *)malloc(layer_full_size * sizeof(size_t));
   if (layer_addr_offsets == NULL) {
     return NULL;
   }
-  float **layers = (float **)malloc(layer_full_size * sizeof(float *));
+
+  if (SIZE_MAX / sizeof(float **) < layer_full_size) {
+    free(layer_addr_offsets);
+    return NULL;
+  }
+  float **layers = (float **)malloc(layer_full_size * sizeof(float **));
   if (layers == NULL) {
     free(layer_addr_offsets);
     return NULL;
@@ -73,6 +80,10 @@ struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
   // + size sum of each layer(except first layer) of backward_layers
   // + size sum of each layer(except first layer) of bias
   // + size sum of each layer(except first layer) of weights
+  if (SIZE_MAX / sizeof(float) < offset_sum) {
+    free(layer_addr_offsets);
+    free(layers);
+  }
   float *layer_neurons = (float *)malloc(offset_sum * sizeof(float));
   if (layer_neurons == NULL) {
     free(layer_addr_offsets);
