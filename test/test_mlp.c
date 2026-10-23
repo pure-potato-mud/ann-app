@@ -4,52 +4,8 @@
 
 #include <mlp.h>
 
-#define TEST_FUNC(x) int x(void)
-#define MLP_ARRANGE_FAIL_IF(mlp, expr)                                         \
-  do {                                                                         \
-    if (expr) {                                                                \
-      mlp_destroy(mlp);                                                        \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-#define MLP_ASSERT(mlp, expr)                                                  \
-  do {                                                                         \
-    if (!(expr)) {                                                             \
-      mlp_destroy(mlp);                                                        \
-      return 2;                                                                \
-    }                                                                          \
-  } while (0)
-
 static float leaky_relu(float value) {
   return (value > 0) ? value : value * 0.03125f;
-}
-
-bool is_approx(float a, float b, float ref) {
-  float tmp = a - b;
-  tmp = tmp > 0 ? tmp : -tmp;
-  return tmp <= ref;
-}
-
-bool is_all_approx(float *a, float b, size_t size, float ref) {
-  int i;
-  for (i = 0; i < size; ++i) {
-    if (is_approx(a[i], b, ref)) {
-      continue;
-    }
-    return false;
-  }
-  return true;
-}
-
-bool is_each_approx(float *a, float *b, size_t size, float ref) {
-  int i;
-  for (i = 0; i < size; ++i) {
-    if (is_approx(a[i], b[i], ref)) {
-      continue;
-    }
-    return false;
-  }
-  return true;
 }
 
 static struct mlp *mlp;
