@@ -9,7 +9,14 @@ struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
     return NULL;
   }
 
+  // SIZE_MAX < layer_size_count * 5U - 4U
+  // => SIZE_MAX < (layer_size_count - 1U) * 5U + 1U
+  // => (SIZE_MAX - 1U) / 5U + 1U < layer_size_count
+  if ((SIZE_MAX - 1U) / 5U + 1U < layer_size_count) {
+    return NULL;
+  }
   size_t layer_full_size = layer_size_count * 5U - 4U;
+
   if (SIZE_MAX / sizeof(size_t) < layer_full_size) {
     return NULL;
   }
