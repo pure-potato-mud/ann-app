@@ -5,7 +5,7 @@
 // WARN: mlp will store pointer layer_sizes, so DO NOT free it before mlp been
 // free.
 struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
-  if (layer_sizes == NULL) {
+  if (layer_sizes == NULL || layer_size_count == 0U) {
     return NULL;
   }
 

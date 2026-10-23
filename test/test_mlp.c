@@ -65,6 +65,16 @@ TEST_FUNC(test_mlp_create) {
   return 0;
 }
 
+TEST_FUNC(test_mlp_size_zero_size) {
+  struct mlp *mlp = mlp_create(layer_sizes, 0);
+
+  if (mlp != NULL) {
+    mlp_destroy(mlp);
+    return 2;
+  }
+  return 0;
+}
+
 TEST_FUNC(test_mlp_create_null) {
   struct mlp *mlp = mlp_create(NULL, layer_size_count);
 
@@ -206,6 +216,7 @@ TEST_FUNC(test_mlp_backward) {
 
 int (*test_functions[])(void) = {
     test_mlp_create,
+    test_mlp_size_zero_size,
     test_mlp_create_null,
     test_mlp_set_learning_rate,
     test_mlp_set_activation_fns_ref,
