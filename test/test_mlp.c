@@ -142,6 +142,15 @@ void test_mlp_forward(void) {
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(1e-7f, except_output, output, 2U);
 }
 
+void test_mlp_forward_null_layer_sizes(void) {
+  mlp = mlp_create(layer_sizes, layer_size_count);
+  TEST_ASSERT_NOT_NULL(mlp);
+  TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
+
+  mlp->layer_sizes_ref = NULL;
+  TEST_ASSERT_EQUAL_INT(2, mlp_forward(mlp, input, NULL));
+}
+
 void test_mlp_forward_null_layers(void) {
   mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
@@ -249,6 +258,17 @@ void test_mlp_backward(void) {
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_1, mlp->biases[0U], 3U);
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, weight_2, mlp->weights[1U], 6U);
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_2, mlp->biases[1U], 2U);
+}
+
+void test_mlp_backward_null_layer_sizes(void) {
+  mlp = mlp_create(layer_sizes, layer_size_count);
+  TEST_ASSERT_NOT_NULL(mlp);
+  TEST_ASSERT_UNLESS(mlp_set_activation_fns_ref(mlp, activation_funcs));
+
+  mlp->layer_sizes_ref = NULL;
+  int result = mlp_backward(mlp, answer);
+
+  TEST_ASSERT_EQUAL_INT(2, result);
 }
 
 void test_mlp_backward_null_layers(void) {
@@ -359,6 +379,7 @@ int main(void) {
   RUN_TEST(test_mlp_fill_random_weights);
 
   RUN_TEST(test_mlp_forward);
+  RUN_TEST(test_mlp_forward_null_layer_sizes);
   RUN_TEST(test_mlp_forward_null_layers);
   RUN_TEST(test_mlp_forward_null_layer);
   RUN_TEST(test_mlp_forward_null_output_layers);
@@ -370,6 +391,7 @@ int main(void) {
   RUN_TEST(test_mlp_forward_null_activation_funcs);
 
   RUN_TEST(test_mlp_backward);
+  RUN_TEST(test_mlp_backward_null_layer_sizes);
   RUN_TEST(test_mlp_backward_null_layers);
   RUN_TEST(test_mlp_backward_null_layer);
   RUN_TEST(test_mlp_backward_null_output_layers);
