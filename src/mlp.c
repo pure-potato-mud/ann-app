@@ -201,28 +201,6 @@ int mlp_fill_weights(struct mlp *mlp, const float value) {
   return 0;
 }
 
-int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed) {
-  if (mlp == NULL) {
-    return 1;
-  }
-  size_t i, j, size;
-  for (i = 0U; i < mlp->layer_size_count - 1U; ++i) {
-    size = mlp->layer_sizes_ref[i] * mlp->layer_sizes_ref[i + 1U];
-    if (mlp->weights[i] == NULL) {
-      return 2;
-    }
-    for (j = 0U; j < size; ++j) {
-
-      seed ^= seed << 7U;
-      seed ^= seed >> 19U;
-      seed ^= seed << 13U;
-
-      mlp->weights[i][j] = 2.0f * ((float)seed / UINT32_MAX) - 1.0f;
-    }
-  }
-  return 0;
-}
-
 int mlp_forward(struct mlp *mlp, const float *const input, float *output) {
   if (mlp == NULL || input == NULL) {
     return 1;

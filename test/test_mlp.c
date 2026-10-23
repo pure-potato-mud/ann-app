@@ -118,23 +118,6 @@ void test_mlp_fill_weights(void) {
   }
 }
 
-void test_mlp_fill_random_weights(void) {
-  mlp = mlp_create(layer_sizes, layer_size_count);
-  TEST_ASSERT_NOT_NULL(mlp);
-
-  TEST_ASSERT_UNLESS(mlp_fill_random_weights(mlp, 0x32a9807bU));
-
-  int i;
-  for (i = 0U; i < 6U; ++i) {
-    float weight_first_layer = mlp->weights[0U][i],
-          weight_second_layer = mlp->weights[1U][i];
-    TEST_ASSERT_GREATER_THAN_FLOAT(-1.0f, weight_first_layer);
-    TEST_ASSERT_LESS_OR_EQUAL_FLOAT(1.0f, weight_first_layer);
-    TEST_ASSERT_GREATER_THAN_FLOAT(-1.0f, weight_second_layer);
-    TEST_ASSERT_LESS_OR_EQUAL_FLOAT(1.0f, weight_second_layer);
-  }
-}
-
 void test_mlp_forward(void) {
   float output[2U], except_output[2U] = {5.5f, 5.5f};
   mlp = mlp_create(layer_sizes, layer_size_count);
@@ -383,8 +366,6 @@ int main(void) {
   RUN_TEST(test_mlp_fill_biases);
 
   RUN_TEST(test_mlp_fill_weights);
-
-  RUN_TEST(test_mlp_fill_random_weights);
 
   RUN_TEST(test_mlp_forward);
   RUN_TEST(test_mlp_forward_null_layer_sizes);

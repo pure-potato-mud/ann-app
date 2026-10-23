@@ -48,10 +48,6 @@ int mlp_fill_biases(struct mlp *mlp, float value);
 // MLP and it's weights field cannot be NULL.
 int mlp_fill_weights(struct mlp *mlp, float value);
 
-// fill all weights with random value within `(-1.0, 1.0]`.
-// MLP and it's weights field cannot be NULL.
-int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed);
-
 // do forward propagation.
 // the MLP(and it's members) and the input cannot be NULL, but the output can.
 // the output will be fill in values if it is not NULL.
