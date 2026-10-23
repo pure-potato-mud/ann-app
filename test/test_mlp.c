@@ -172,7 +172,7 @@ void test_mlp_backward(void) {
 }
 
 void test_mlp_backward_no_activation_funcs(void) {
-  struct mlp *mlp = mlp_create(layer_sizes, layer_size_count);
+  mlp = mlp_create(layer_sizes, layer_size_count);
   TEST_ASSERT_NOT_NULL(mlp);
 
   TEST_ASSERT_EQUAL_INT(2U, mlp_backward(mlp, answer));
