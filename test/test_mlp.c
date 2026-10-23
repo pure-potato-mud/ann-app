@@ -162,8 +162,8 @@ void test_mlp_backward(void) {
   TEST_ASSERT_UNLESS(mlp_fill_biases(mlp, -0.5f));
   TEST_ASSERT_UNLESS(mlp_fill_weights(mlp, 1.0f));
 
-  mlp_forward(mlp, input, output);
-  mlp_backward(mlp, answer);
+  TEST_ASSERT_UNLESS(mlp_forward(mlp, input, output));
+  TEST_ASSERT_UNLESS(mlp_backward(mlp, answer));
 
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, weight_1, mlp->weights[0U], 6U);
   TEST_ASSERT_FLOAT_ARRAY_WITHIN(3e-6f, bias_1, mlp->biases[0U], 3U);
