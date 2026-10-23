@@ -336,9 +336,9 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
     current_weights = weights[i];
     current_biases = biases[i];
     activation_function = activation_funcs_ref[i];
-    if (layer == NULL || current_backward_layer == NULL ||
-        current_weights == NULL || current_biases == NULL ||
-        activation_function == NULL) {
+    if (layer == NULL || output_layer == NULL ||
+        current_backward_layer == NULL || current_weights == NULL ||
+        current_biases == NULL || activation_function == NULL) {
       return 3;
     }
 
