@@ -300,8 +300,7 @@ int mlp_backward(struct mlp *mlp, const float *const answer) {
   float **const weights = mlp->weights;
   float (**activation_funcs_ref)(float) = mlp->activation_funcs_ref;
   if (layers == NULL || output_layers == NULL || backward_layers == NULL ||
-      biases == NULL || weights == NULL || weights == NULL ||
-      activation_funcs_ref == NULL) {
+      biases == NULL || weights == NULL || activation_funcs_ref == NULL) {
     return 2;
   }
 
