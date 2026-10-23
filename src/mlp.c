@@ -11,6 +11,11 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
 
   size_t layer_full_size = layer_size_count * 5 - 4;
 
+  size_t *layer_addr_offsets =
+      (size_t *)malloc(layer_full_size * sizeof(size_t));
+  if (layer_addr_offsets == NULL) {
+    return NULL;
+  }
   float **layers = (float **)malloc(layer_full_size * sizeof(float *));
   if (layers == NULL) {
     return NULL;
@@ -43,7 +48,7 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
       return NULL;
     }
     // get address offset
-    layers[i] = (float *)offset_sum;
+    layer_addr_offsets[i] = offset_sum;
     offset_sum += current_size;
   }
 
@@ -60,8 +65,9 @@ struct mlp *mlp_create(const size_t *layer_sizes, size_t layer_size_count) {
   }
   // offset to real pointer
   for (i = 0; i < layer_full_size; ++i) {
-    layers[i] = layer_elements + (size_t)layers[i];
+    layers[i] = layer_elements + layer_addr_offsets[i];
   }
+  free(layer_addr_offsets);
 
   struct mlp *mlp = (struct mlp *)malloc(sizeof(struct mlp));
   if (mlp == NULL) {
