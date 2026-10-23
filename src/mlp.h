@@ -11,7 +11,7 @@ struct mlp {
   const size_t *layer_sizes_ref;         // n1, n2...
   float **layers;                        // input & activated ouput (N)
   float **output_layers;                 // output (N-1)
-  float **backward_layers;               // passes gradiants (N-1)
+  float **backward_layers;               // passes gradients (N-1)
   float **weights;                       // weights(N-1)
   float **biases;                        // bias (N-1)
   float (**activation_funcs_ref)(float); // activation functions(N-1)
@@ -33,8 +33,8 @@ void mlp_destroy(struct mlp *mlp);
 int mlp_set_learning_rate(struct mlp *mlp, float learning_rate);
 
 // set activation functions reference.
-// size must same as layer count of the MLP.
-// the MLP and the activatioin functions reference cannot be NULL.
+// size must same as `layer_count - 1` of the MLP.
+// the MLP and the activation functions reference cannot be NULL.
 // activation_fns_ref will keep and store in mlp. DO NOT free activation_fns_ref
 // before mlp been free.
 int mlp_set_activation_fns_ref(struct mlp *mlp,
