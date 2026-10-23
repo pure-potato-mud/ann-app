@@ -35,6 +35,8 @@ int mlp_set_learning_rate(struct mlp *mlp, float learning_rate);
 // set activation functions reference.
 // size must same as layer count of the MLP.
 // the MLP and the activatioin functions reference cannot be NULL.
+// activation_fns_ref will keep and store in mlp. DO NOT free activation_fns_ref
+// before mlp been free.
 int mlp_set_activation_fns_ref(struct mlp *mlp,
                                float (**activation_fns_ref)(float));
 
@@ -46,7 +48,7 @@ int mlp_fill_biases(struct mlp *mlp, float value);
 // MLP and it's weights field cannot be NULL.
 int mlp_fill_weights(struct mlp *mlp, float value);
 
-// fill all weights with random value within `(0.0, 1.0]`.
+// fill all weights with random value within `(-1.0, 1.0]`.
 // MLP and it's weights field cannot be NULL.
 int mlp_fill_random_weights(struct mlp *mlp, uint32_t seed);
 
