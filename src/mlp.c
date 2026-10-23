@@ -30,7 +30,7 @@ struct mlp *mlp_create(const size_t *layer_sizes_ref, size_t layer_size_count) {
     free(layer_addr_offsets);
     return NULL;
   }
-  float **layers = (float **)malloc(layer_full_size * sizeof(float **));
+  float **layers = (float **)malloc(layer_full_size * sizeof(float *));
   if (layers == NULL) {
     free(layer_addr_offsets);
     return NULL;
