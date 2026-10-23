@@ -28,5 +28,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 include(CTest)
 
 if(BUILD_TESTING)
+  add_subdirectory(third_party/Unity)
+
   add_subdirectory(test)
 endif()
