@@ -7,4 +7,5 @@ target_link_libraries(test_mlp
   PRIVATE mlp
 )
 
+set_tests_properties(PROPERTIES CTEST_TEST_TIMEOUT 1)
 add_test(NAME test_mlp COMMAND test_mlp)
